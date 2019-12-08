@@ -1,0 +1,13 @@
+apiVersion: skaffold/v2beta4
+kind: Config
+build:
+  tagPolicy:
+    gitCommit: {}
+  artifacts:
+  - image: jvm-operator
+    context: .
+    jib: {}
+deploy:
+  kubectl:
+    manifests:
+    - deploy.yml
