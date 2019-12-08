@@ -11,7 +11,7 @@ public class ListPods {
     private static final Logger LOGGER = LoggerFactory.getLogger(ListPods.class);
 
     public static void main(String[] args) throws Exception {
-        LOGGER.info("*** JVM Operator v1.0 ***");
+        LOGGER.info("*** JVM Operator v1.1 ***");
         var client = Config.defaultClient();
         Configuration.setDefaultApiClient(client);
         var core = new CoreV1Api();

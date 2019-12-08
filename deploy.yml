@@ -9,7 +9,8 @@ metadata:
   namespace: jvmoperator
   name: custom-operator
 spec:
+  serviceAccountName: operator-service
   containers:
     - name: custom-operator
-      image: jvm-operator:1.0
+      image: jvm-operator:1.1
       imagePullPolicy: Never

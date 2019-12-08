@@ -10,4 +10,5 @@ build:
 deploy:
   kubectl:
     manifests:
+    - authorization.yml
     - deploy.yml

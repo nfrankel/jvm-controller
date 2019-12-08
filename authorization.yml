@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jvmoperator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  namespace: jvmoperator
+  name: operator-example
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - list
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: operator-service
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: operator-example
+subjects:
+  - kind: ServiceAccount
+    name: operator-service
+    namespace: jvmoperator
+roleRef:
+  kind: ClusterRole
+  name: operator-example
+  apiGroup: rbac.authorization.k8s.io
