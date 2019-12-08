@@ -25,6 +25,10 @@
                     <to>
                         <image>jvm-operator:${project.version}</image>
                     </to>
+                    <container>
+                        <!-- Because of https://github.com/kubernetes-client/java/issues/893 -->
+                        <jvmFlags>-Djdk.tls.client.protocols=TLSv1.2</jvmFlags>
+                    </container>
                 </configuration>
                 <executions>
                     <execution>

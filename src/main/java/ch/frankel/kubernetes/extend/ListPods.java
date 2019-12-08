@@ -8,9 +8,10 @@ import org.slf4j.LoggerFactory;
 
 public class ListPods {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(ListPods.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ListPods.class);
 
     public static void main(String[] args) throws Exception {
+        LOGGER.info("*** JVM Operator v1.0 ***");
         var client = Config.defaultClient();
         Configuration.setDefaultApiClient(client);
         var core = new CoreV1Api();
