@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>blog.frankel.ch</groupId>
     <artifactId>jvm-operator</artifactId>
-    <version>1.7</version>
+    <version>1.8</version>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -38,9 +38,9 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>io.kubernetes</groupId>
-            <artifactId>client-java</artifactId>
-            <version>6.0.1</version>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-client</artifactId>
+            <version>4.6.4</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
