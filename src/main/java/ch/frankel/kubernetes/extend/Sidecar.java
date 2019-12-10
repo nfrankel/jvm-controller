@@ -1,45 +1,33 @@
 package ch.frankel.kubernetes.extend;
 
-import io.kubernetes.client.ApiClient;
-import io.kubernetes.client.Configuration;
-import io.kubernetes.client.apis.CoreV1Api;
-import io.kubernetes.client.informer.SharedIndexInformer;
-import io.kubernetes.client.informer.SharedInformerFactory;
-import io.kubernetes.client.models.V1Pod;
-import io.kubernetes.client.models.V1PodList;
-import io.kubernetes.client.util.Config;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodList;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
+import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Sidecar {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sidecar.class);
 
-    public static void main(String[] args) throws Exception {
-        LOGGER.info("*** JVM Operator v1.6 ***");
-        ApiClient client = Config.defaultClient();
-        Configuration.setDefaultApiClient(client);
-        print();
+    public static void main(String[] args) {
+        LOGGER.info("*** JVM Operator v1.7 ***");
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        DefaultKubernetesClient client = new DefaultKubernetesClient();
+        Runtime.getRuntime().addShutdownHook(new Thread(client::close));
+        service.submit(() -> print(client));
     }
 
-    private static void print() {
-        CoreV1Api api = new CoreV1Api();
-        SharedInformerFactory factory = new SharedInformerFactory();
-        SharedIndexInformer<V1Pod> informer = factory.sharedIndexInformerFor(
-                it -> api.listPodForAllNamespacesCall(
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        it.resourceVersion,
-                        it.timeoutSeconds,
-                        it.watch,
-                        null,
-                        null),
-                V1Pod.class,
-                V1PodList.class);
-        informer.addEventHandler(new SidecarEventHandler());
-        factory.startAllRegisteredInformers();
+    private static void print(KubernetesClient client) {
+        SharedInformerFactory factory = client.informers();
+        SharedIndexInformer<Pod> informer = factory.sharedIndexInformerFor(
+                Pod.class, PodList.class, 10 * 60 * 1000);
+        informer.addEventHandler(new SidecarEventHandler(client));
     }
 }
