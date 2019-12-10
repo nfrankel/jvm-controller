@@ -9,12 +9,12 @@ import io.kubernetes.client.util.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ListPods {
+public class Sidecar {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ListPods.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Sidecar.class);
 
     public static void main(String[] args) throws Exception {
-        LOGGER.info("*** JVM Operator v1.4 ***");
+        LOGGER.info("*** JVM Operator v1.5 ***");
         var client = Config.defaultClient();
         Configuration.setDefaultApiClient(client);
         print();
@@ -38,7 +38,7 @@ public class ListPods {
                         null),
                 V1Pod.class,
                 V1PodList.class);
-        informer.addEventHandler(new PodLogEventHandler());
+        informer.addEventHandler(new SidecarEventHandler());
         factory.startAllRegisteredInformers();
     }
 }
