@@ -22,14 +22,13 @@ public class SidecarEventHandler implements ResourceEventHandler<V1Pod> {
         var namespace = pod.getMetadata().getNamespace();
         if (NAMESPACE.equals(namespace) && !isSidecar(pod)) {
             try {
-                var podName = pod.getMetadata().getName();
                 if (!alreadyHasSidecar(pod)) {
-                    createSidecar(namespace, podName);
+                    createSidecar(pod);
                 } else {
-                    LOGGER.info("Sidecar already existing for pod {}", podName);
+                    LOGGER.info("Sidecar already existing for pod {}", pod.getMetadata().getName());
                 }
             } catch (ApiException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage(), e);
             }
         }
     }
@@ -41,16 +40,6 @@ public class SidecarEventHandler implements ResourceEventHandler<V1Pod> {
 
     @Override
     public void onDelete(V1Pod pod, boolean stateUnknown) {
-        var api = new CoreV1Api();
-        try {
-            if (alreadyHasSidecar(pod)) {
-                var podName = pod.getMetadata().getName();
-                LOGGER.info("Sidecar found for pod {}", podName);
-                api.deleteNamespacedPod(SIDECAR_POD_NAME + "-" + podName, NAMESPACE, null, null, null, null, null, null);
-            }
-        } catch (ApiException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
     }
 
     private boolean isSidecar(V1Pod pod) {
@@ -60,7 +49,9 @@ public class SidecarEventHandler implements ResourceEventHandler<V1Pod> {
                 .getOrDefault("sidecar", "false"));
     }
 
-    private void createSidecar(String namespace, String podName) throws ApiException {
+    private void createSidecar(V1Pod pod) throws ApiException {
+        var namespace = pod.getMetadata().getNamespace();
+        var podName = pod.getMetadata().getName();
         var name = SIDECAR_POD_NAME + "-" + podName;
         var container = new V1Container()
                 .name(name)
@@ -68,9 +59,15 @@ public class SidecarEventHandler implements ResourceEventHandler<V1Pod> {
         var spec = new V1PodSpec().addContainersItem(container);
         var labels = new HashMap<String, String>();
         labels.put("sidecar", "true");
+        var owner = new V1OwnerReference()
+                .apiVersion("v1")
+                .uid(pod.getMetadata().getUid())
+                .name(podName)
+                .kind("Pod");
         var metadata = new V1ObjectMeta()
                 .name(name)
                 .namespace(namespace)
+                .addOwnerReferencesItem(owner)
                 .labels(labels);
         var body = new V1Pod()
                 .apiVersion("v1")
