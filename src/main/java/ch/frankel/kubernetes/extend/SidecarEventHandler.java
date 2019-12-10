@@ -23,14 +23,13 @@ public class SidecarEventHandler implements ResourceEventHandler<V1Pod> {
         String namespace = pod.getMetadata().getNamespace();
         if (NAMESPACE.equals(namespace) && !isSidecar(pod)) {
             try {
-                String podName = pod.getMetadata().getName();
                 if (!alreadyHasSidecar(pod)) {
-                    createSidecar(namespace, podName);
+                    createSidecar(pod);
                 } else {
-                    LOGGER.info("Sidecar already existing for pod " + podName);
+                    LOGGER.info("Sidecar already existing for pod " + pod.getMetadata().getName());
                 }
             } catch (ApiException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage(), e);
             }
         }
     }
@@ -42,17 +41,7 @@ public class SidecarEventHandler implements ResourceEventHandler<V1Pod> {
 
     @Override
     public void onDelete(V1Pod pod, boolean stateUnknown) {
-        CoreV1Api api = new CoreV1Api();
-        try {
-            if (alreadyHasSidecar(pod)) {
-                String podName = pod.getMetadata().getName();
-                LOGGER.info("Sidecar found for pod " + podName);
-                // https://github.com/kubernetes-client/java/issues/86
-                api.deleteNamespacedPod(SIDECAR_POD_NAME + "-" + podName, NAMESPACE, null, null, null, null, null, null);
-            }
-        } catch (ApiException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+        // NOTHING TO DO
     }
 
     private boolean isSidecar(V1Pod pod) {
@@ -62,7 +51,9 @@ public class SidecarEventHandler implements ResourceEventHandler<V1Pod> {
                 .getOrDefault("sidecar", "false"));
     }
 
-    private void createSidecar(String namespace, String podName) throws ApiException {
+    private void createSidecar(V1Pod pod) throws ApiException {
+        String namespace = pod.getMetadata().getNamespace();
+        String podName = pod.getMetadata().getName();
         String name = SIDECAR_POD_NAME + "-" + podName;
         V1Container container = new V1Container()
                 .name(name)
@@ -70,9 +61,15 @@ public class SidecarEventHandler implements ResourceEventHandler<V1Pod> {
         V1PodSpec spec = new V1PodSpec().addContainersItem(container);
         Map<String, String> labels = new HashMap<>();
         labels.put("sidecar", "true");
+        V1OwnerReference owner = new V1OwnerReference()
+                .apiVersion("v1")
+                .uid(pod.getMetadata().getUid())
+                .name(podName)
+                .kind("Pod");
         V1ObjectMeta metadata = new V1ObjectMeta()
                 .name(name)
                 .namespace(namespace)
+                .addOwnerReferencesItem(owner)
                 .labels(labels);
         V1Pod body = new V1Pod()
                 .apiVersion("v1")
