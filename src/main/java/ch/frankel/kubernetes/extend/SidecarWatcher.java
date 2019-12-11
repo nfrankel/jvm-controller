@@ -2,7 +2,8 @@ package ch.frankel.kubernetes.extend;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
+import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.kubernetes.client.Watcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,42 +11,44 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class SidecarEventHandler implements ResourceEventHandler<Pod> {
+public class SidecarWatcher implements Watcher<Pod> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SidecarEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SidecarWatcher.class);
     private static final String SIDECAR_IMAGE_NAME = "hazelcast/hazelcast:3.12.5";
     private static final String SIDECAR_POD_NAME = "hazelcast";
-    private static final String NAMESPACE = "jvmoperator";
+    public static final String NAMESPACE = "jvmoperator";
 
     private final KubernetesClient client;
 
-    public SidecarEventHandler(KubernetesClient client) {
+    public SidecarWatcher(KubernetesClient client) {
         this.client = client;
     }
 
     @Override
-    public void onAdd(Pod pod) {
-        String namespace = pod.getMetadata().getNamespace();
-        if (NAMESPACE.equals(namespace) && !isSidecar(pod)) {
-            if (!alreadyHasSidecar(pod)) {
-                createSidecar(pod);
-            } else {
-                LOGGER.info("Sidecar already existing for pod " + pod.getMetadata().getName());
-            }
+    public void eventReceived(Action action, Pod pod) {
+        switch (action) {
+            case ADDED:
+                String namespace = pod.getMetadata().getNamespace();
+                if (NAMESPACE.equals(namespace) && !isSidecar(pod)) {
+                    if (!alreadyHasSidecar(pod)) {
+                        createSidecar(pod);
+                    } else {
+                        LOGGER.info("Sidecar already existing for pod " + pod.getMetadata().getName());
+                    }
+                }
+                break;
+            case DELETED:
+                if (isAssignedSidecar(pod)) {
+                    pod.getMetadata().setResourceVersion(null);
+                    client.pods().inNamespace(NAMESPACE).create(pod);
+                }
+                break;
         }
     }
 
     @Override
-    public void onUpdate(Pod oldPod, Pod newPod) {
+    public void onClose(KubernetesClientException cause) {
         // NOTHING TO DO
-    }
-
-    @Override
-    public void onDelete(Pod pod, boolean stateUnknown) {
-        if (isAssignedSidecar(pod)) {
-            pod.getMetadata().setResourceVersion(null);
-            client.pods().inNamespace(NAMESPACE).create(pod);
-        }
     }
 
     private boolean isSidecar(Pod pod) {
