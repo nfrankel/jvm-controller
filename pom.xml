@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>blog.frankel.ch</groupId>
     <artifactId>jvm-operator</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>

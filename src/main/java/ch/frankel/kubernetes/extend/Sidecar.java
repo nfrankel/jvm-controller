@@ -16,7 +16,7 @@ public class Sidecar {
     private static final Logger LOGGER = LoggerFactory.getLogger(Sidecar.class);
 
     public static void main(String[] args) throws Exception {
-        LOGGER.info("*** JVM Operator v1.5 ***");
+        LOGGER.info("*** JVM Operator v1.6 ***");
         ApiClient client = Config.defaultClient();
         Configuration.setDefaultApiClient(client);
         print();
