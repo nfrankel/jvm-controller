@@ -12,5 +12,5 @@ spec:
   serviceAccountName: operator-service
   containers:
     - name: custom-operator
-      image: jvm-operator:1.8
+      image: jvm-operator:1.9
       imagePullPolicy: Never
