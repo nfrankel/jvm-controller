@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>blog.frankel.ch</groupId>
     <artifactId>jvm-operator</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
     <properties>
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

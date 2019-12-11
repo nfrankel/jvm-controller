@@ -40,6 +40,15 @@ public class SidecarEventHandler implements ResourceEventHandler<V1Pod> {
 
     @Override
     public void onDelete(V1Pod pod, boolean stateUnknown) {
+        if (isAssignedSidecar(pod)) {
+            try {
+                var api = new CoreV1Api();
+                pod.getMetadata().setResourceVersion(null);
+                api.createNamespacedPod(pod.getMetadata().getNamespace(), pod, "true", null, null);
+            } catch (ApiException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private boolean isSidecar(V1Pod pod) {
@@ -90,5 +99,12 @@ public class SidecarEventHandler implements ResourceEventHandler<V1Pod> {
                 .stream()
                 .filter(it -> it.getMetadata().getName().equals(SIDECAR_POD_NAME + "-" + pod.getMetadata().getName()))
                 .findAny();
+    }
+
+    private boolean isAssignedSidecar(V1Pod pod) {
+        var metadata = pod.getMetadata();
+        return metadata.getName().startsWith(SIDECAR_POD_NAME + "-")
+                && metadata.getOwnerReferences().stream()
+                .anyMatch(it -> "Pod".equals(it.getKind()) && "v1".equals(it.getApiVersion()));
     }
 }
