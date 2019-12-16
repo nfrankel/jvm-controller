@@ -1,0 +1,8 @@
+{
+  "resources":[
+    {"pattern":"META-INF/services/io.fabric8.kubernetes.api.KubernetesResourceMappingProvider"}, 
+    {"pattern":"org/slf4j/impl/StaticLoggerBinder.class"}, 
+    {"pattern":"sun/net/idn/uidna.spp"}, 
+    {"pattern":"sun/text/resources/unorm.icu"}
+  ]
+}
