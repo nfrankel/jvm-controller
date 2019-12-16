@@ -1,4 +1,5 @@
 **
 !src/**
 !pom.xml
+!dependencies/**
 !config/*
