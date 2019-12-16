@@ -12,5 +12,12 @@ spec:
   serviceAccountName: operator-service
   containers:
     - name: custom-operator
-      image: jvm-operator:1.8
+      image: jvm-operator:1.8.5
       imagePullPolicy: Never
+      volumeMounts:
+        - name: share
+          mountPath: /graalvm/config
+  volumes:
+    - name: share
+      hostPath:
+        path: /graalvm/config
