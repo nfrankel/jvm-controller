@@ -1,0 +1,8 @@
+{
+  "resources":{
+  "includes":[
+    {"pattern":"\\QMETA-INF/services/io.fabric8.kubernetes.api.KubernetesResourceMappingProvider\\E"}, 
+    {"pattern":"\\Qorg/slf4j/impl/StaticLoggerBinder.class\\E"}
+  ]},
+  "bundles":[]
+}

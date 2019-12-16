@@ -6,7 +6,7 @@ build:
   artifacts:
   - image: jvm-operator
     context: .
-    jib: {}
+  local: {}
 deploy:
   kubectl:
     manifests:
