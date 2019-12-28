@@ -1,6 +1,6 @@
-# docker build -t jvm-operator:2.3 .
+# docker build -t jvm-operator:2.4 .
 
-ARG VERSION=2.3
+ARG VERSION=2.4
 
 FROM maven:3-adoptopenjdk-11 as build
 WORKDIR /app
