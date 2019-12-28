@@ -1,6 +1,6 @@
-# docker build -t jvm-operator:2.2 .
+# docker build -t jvm-operator:2.3 .
 
-ARG VERSION=2.2
+ARG VERSION=2.3
 
 FROM maven:3-adoptopenjdk-11 as build
 WORKDIR /app
@@ -12,17 +12,9 @@ RUN mvn package
 FROM ghcr.io/graalvm/graalvm-ce:21.2.0 as native
 ARG VERSION
 COPY --from=build /app/target/jvm-operator-$VERSION.jar /var/jvm-operator-$VERSION.jar
-COPY config /var/config
 WORKDIR /opt/graalvm
 RUN gu install native-image \
- && native-image -J-Xmx3072m \
-   --allow-incomplete-classpath \
-   --no-fallback \
-   --no-server \
-   -H:EnableURLProtocols=https \
-   -H:ConfigurationFileDirectories=/var/config \
-   -H:+AddAllCharsets \
-   -jar /var/jvm-operator-$VERSION.jar \
+ && native-image -jar /var/jvm-operator-$VERSION.jar \
  && mv jvm-operator-$VERSION /opt/jvm-operator-$VERSION
 
 FROM frolvlad/alpine-glibc:alpine-3.11_glibc-2.31
