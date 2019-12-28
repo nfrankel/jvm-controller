@@ -9,7 +9,7 @@ public class Sidecar {
     private static final Logger LOGGER = LoggerFactory.getLogger(Sidecar.class);
 
     public static void main(String[] args) {
-        LOGGER.info("*** JVM Operator v2.4 ***");
+        LOGGER.info("*** JVM Operator v2.5 ***");
         DefaultKubernetesClient client = new DefaultKubernetesClient();
         client.pods().inNamespace(SidecarWatcher.NAMESPACE)
                 .watch(new SidecarWatcher(client));

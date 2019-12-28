@@ -1,6 +1,6 @@
-# docker build -t jvm-operator:2.4 .
+# docker build -t jvm-operator:2.5 .
 
-ARG VERSION=2.4
+ARG VERSION=2.5
 
 FROM zenika/alpine-maven:3 as build
 COPY pom.xml .
