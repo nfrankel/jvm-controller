@@ -12,8 +12,5 @@ spec:
   serviceAccountName: operator-service
   containers:
     - name: custom-operator
-      image: jvm-operator:1.12
+      image: jvm-operator:1.13
       imagePullPolicy: Never
-      env:
-        - name: KUBERNETES_AUTH_TRYKUBECONFIG
-          value: "false"

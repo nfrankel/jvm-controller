@@ -1,6 +1,6 @@
-# docker build -t jvm-operator:1.12 .
+# docker build -t jvm-operator:1.13 .
 
-ARG VERSION=1.12
+ARG VERSION=1.13
 
 FROM zenika/alpine-maven:3 as build
 COPY src src
