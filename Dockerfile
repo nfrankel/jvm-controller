@@ -1,11 +1,10 @@
-# docker build -t jvm-operator:1.9 .
+# docker build -t jvm-operator:1.10 .
 
-ARG VERSION=1.9
+ARG VERSION=1.10
 
 FROM zenika/alpine-maven:3 as build
 COPY src src
 COPY pom.xml pom.xml
-COPY dependencies /root/.m2/repository/com/squareup/okhttp3/okhttp/3.12.6-graalfix
 RUN mvn package
 
 FROM oracle/graalvm-ce:20.0.0 as native
@@ -20,6 +19,7 @@ RUN gu install native-image \
    --no-server \
    -H:EnableURLProtocols=https \
    -H:ConfigurationFileDirectories=/var/config \
+   -H:+AddAllCharsets \
    -jar /var/jvm-operator-$VERSION.jar \
  && mv jvm-operator-$VERSION /opt/jvm-operator-$VERSION
 
