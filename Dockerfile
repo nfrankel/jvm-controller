@@ -1,10 +1,9 @@
-# docker build -t jvm-operator:2.1 .
+# docker build -t jvm-operator:2.2 .
 
-ARG VERSION=2.1
+ARG VERSION=2.2
 
 FROM zenika/alpine-maven:3 as build
 COPY pom.xml .
-COPY dependencies /root/.m2/repository/com/squareup/okhttp3/okhttp/3.12.6-graalfix
 RUN mvn -B dependency:resolve-plugins dependency:resolve
 COPY . .
 RUN mvn package
@@ -21,6 +20,7 @@ RUN gu install native-image \
    --no-server \
    -H:EnableURLProtocols=https \
    -H:ConfigurationFileDirectories=/var/config \
+   -H:+AddAllCharsets \
    -jar /var/jvm-operator-$VERSION.jar \
  && mv jvm-operator-$VERSION /opt/jvm-operator-$VERSION
 
