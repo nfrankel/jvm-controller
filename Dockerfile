@@ -1,6 +1,6 @@
-# docker build -t jvm-operator:2.4 .
+# docker build -t jvm-operator:2.5 .
 
-ARG VERSION=2.4
+ARG VERSION=2.5
 
 FROM maven:3-adoptopenjdk-11 as build
 WORKDIR /app
@@ -17,10 +17,8 @@ RUN gu install native-image \
  && native-image -jar /var/jvm-operator-$VERSION.jar \
  && mv jvm-operator-$VERSION /opt/jvm-operator-$VERSION
 
-FROM frolvlad/alpine-glibc:alpine-3.11_glibc-2.31
+FROM scratch
 ARG VERSION
 WORKDIR /home
 COPY --from=native /opt/jvm-operator-$VERSION operator
-COPY --from=native /opt/graalvm-ce-java11-21.2.0/lib/libsunec.so libsunec.so
-RUN apk add --no-cache libstdc++
 ENTRYPOINT ["./operator"]
